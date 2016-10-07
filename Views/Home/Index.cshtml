@@ -1,0 +1,91 @@
+﻿@{
+   
+}
+    <script type="text/javascript">
+        var CSearch = function () {
+            $.ajax({
+                url: '@Url.Action("Csearch")',
+                type: "post",
+                data: { imageNumber: $("#imageNumber").val() },
+                success: function (data) {
+                    console.log("success");
+                }
+            });
+        };
+        var Query = function () {
+            $("#trainsTable").html("");
+            $.ajax({
+                url: '@Url.Action("GetDataJson")',
+                type: "post",
+                data: { seachtime: $("#searchtime").val(), CarClass: $("#carclassDL").val(), start: $("#startstationDL").val(), end: $("#endstationDL").val() },
+                dataType: "json",
+                success: function (data) {
+                         console.log(data);                         
+                    $.each(data, function (index, value) {
+                        var StartStationName = "";
+                        var EndStationName = "";
+                        $.each(value.TimeInfos, function (index2, value2) {
+                            //console.log(value.TimeInfos.length);
+                            var total = value.TimeInfos.length;
+                            if (index2 == 0)
+                            {
+                                StartStationName = value2.StationName;
+                            }
+                            if (index2 == total - 1)
+                            {
+                                console.log(value2.Station);
+                                EndStationName = value2.StationName;
+                            }
+                            
+                        });
+                        $("#trainsTable").append("<tr><td>" + value.Train + "</td>" +
+                                                       "<td>" + value.CarClassName + "</td>" +
+                                                       "<td>起站:" + StartStationName + "</td>" +
+                                                       "<td>迄站:" + EndStationName + "</td>" +
+                                                       "</tr>");
+                    });
+                        
+
+                    
+
+
+                   
+                }
+            });
+        };
+        $(function () {
+            $("#searchtime").datepicker({
+                dateFormat: "yymmdd"
+            });
+            // console.log($('#iframeDiv').html());
+            setTimeout("GetHtml()",5000);
+        });
+        var GetHtml = function ()
+        {
+            var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            
+            console.log(iframeDocument);
+        }
+        
+    </script>
+
+    
+
+    <div id="traininfos" class="row">
+       
+        @Html.TextBox("searchtime")
+        <a>起站:</a>@Html.DropDownList("startstationDL",(SelectList)ViewBag.Station)
+        <a>迄站:</a>@Html.DropDownList("endstationDL", (SelectList)ViewBag.Station)
+        @Html.DropDownList("carclassDL", (SelectList)ViewBag.CarClass)
+        <button onclick="Query();">查詢</button>
+        <table id="trainsTable">
+
+        </table>
+       
+    </div>
+<div id="iframeDiv">
+   <iframe src="http://railway1.hinet.net/csearch.htm" id="iframe" width="500" height="500"></iframe>
+    @*<img src="http://railway1.hinet.net/ImageOut.jsp" />*@
+    @Html.TextBox("imageNumber");
+    <button onclick="CSearch();">剩餘車票</button>
+</div>
